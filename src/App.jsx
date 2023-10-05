@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import React from 'react';
 import './App.css';
@@ -8,7 +8,7 @@ import PrivateRoute from './utils/PrivateRoute'
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <AuthProvider>
         <Routes>
           <Route path="/" element={<PrivateRoute><PageHome/></PrivateRoute>}/>
@@ -16,7 +16,7 @@ function App() {
           <Route path="/login" element={<PageLogin/>}/>
         </Routes>
       </AuthProvider>
-    </BrowserRouter>
+    </Router>
   );
 }
 

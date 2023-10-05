@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
 
     let [user, setUser] = useState(() => (localStorage.getItem('authTokens') ? jwtDecode(localStorage.getItem('authTokens')) : null))
     let [authTokens, setAuthTokens] = useState(() => (localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null))
-    let [loading, setLoading] = useState(true)
 
     const navigate = useNavigate()
 
@@ -19,12 +18,15 @@ export const AuthProvider = ({ children }) => {
         const response = await fetch('http://127.0.0.1:8000/proyecto/token', {
             method: 'POST',
             headers: {
+                Accept: 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ correo: e.target.correo.value, password: e.target.password.value })
         });
 
         let data = await response.json()
+
+        console.log('Valor de authTokens después del inicio de sesión:', data);
 
         if (data) {
             localStorage.setItem('authTokens', JSON.stringify(data));
@@ -33,7 +35,7 @@ export const AuthProvider = ({ children }) => {
             setUser(decodeJWT)
 
             if (decodeJWT.is_superuser === true) {
-                navigate('/')
+                navigate('/main')
             } else {
                 alert('No tienes permisos de superusuario para esta acción');
             }
@@ -56,6 +58,7 @@ export const AuthProvider = ({ children }) => {
         const response = await fetch('http://127.0.0.1:8000/proyecto/token/refresh', {
             method: 'POST',
             headers: {
+                Accept: 'application/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ refresh: authTokens?.refresh })
@@ -70,11 +73,6 @@ export const AuthProvider = ({ children }) => {
         } else {
             logoutUser()
         }
-
-        if (loading) {
-            setLoading(false)
-        }
-
     }
 
     let contextData = {
@@ -85,9 +83,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        if (loading) {
-            updateToken()
-        }
 
         const REFRESH_INTERVAL = 1000 * 60 * 4 // 4 minutos
         let interval = setInterval(() => {
@@ -97,7 +92,7 @@ export const AuthProvider = ({ children }) => {
         }, REFRESH_INTERVAL)
         return () => clearInterval(interval)
 
-    }, [authTokens, loading])
+    }, [authTokens])
 
 
     return (
