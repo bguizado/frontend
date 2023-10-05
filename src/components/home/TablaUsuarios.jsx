@@ -1,22 +1,41 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Button, Form, Input, Popconfirm, Table, Modal } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import AuthContext from '../../context/AuthContext';
 
 const TablaUsuarios = () => {
-    const [dataSource, setDataSource] = useState([
-        {
-            key: '0',
-            name: 'Edward King 0',
-            age: '32',
-            address: 'London, Park Lane no. 0',
-        },
-        {
-            key: '1',
-            name: 'Edward King 1',
-            age: '32',
-            address: 'London, Park Lane no. 1',
-        },
-    ]);
+    const { authTokens } = useContext(AuthContext);
+    const [dataSource, setDataSource] = useState([]); // Inicializa el estado vacío
+  
+    useEffect(() => {
+      // Dentro de un efecto, puedes realizar la llamada a la API de forma asincrónica
+      const fetchData = async () => {
+        try {
+          const response = await fetch('http://127.0.0.1:8000/proyecto/usuarios', {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + String(authTokens.access)
+            }
+          });
+  
+          if (response.status === 200) {
+            const data = await response.json();
+            console.log(data)
+            setDataSource(data.content); // Almacena los datos en el estado
+          } else {
+            console.error('Error:', response.status);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      };
+  
+      fetchData(); // Llama a la función para obtener los datos
+    }, [authTokens.access]);
+
+    
     const [count, setCount] = useState(2);
     const handleDelete = (key) => {
         const newData = dataSource.filter((item) => item.key !== key);
@@ -24,18 +43,22 @@ const TablaUsuarios = () => {
     };
     const defaultColumns = [
         {
-            title: 'name',
-            dataIndex: 'name',
-            width: '30%',
+            title: 'Nombre',
+            dataIndex: 'nombre',
             editable: true,
         },
         {
-            title: 'age',
-            dataIndex: 'age',
+            title: 'Apellido',
+            dataIndex: 'apellido',
         },
         {
-            title: 'address',
-            dataIndex: 'address',
+            title: 'Correo',
+            dataIndex: 'correo',
+            width: '30%',
+        },
+        {
+            title: 'Ultima Sesion',
+            dataIndex: 'last_login',
         },
         {
             title: 'operation',
@@ -139,9 +162,6 @@ const TablaUsuarios = () => {
                     </Form.Item>
                 </Form>
             </Modal>
-
-
-
 
             <Table
                 rowClassName={() => 'editable-row'}
