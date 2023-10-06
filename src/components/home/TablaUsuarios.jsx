@@ -3,10 +3,88 @@ import { Button, Form, Input, Popconfirm, Table, Modal } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import AuthContext from '../../context/AuthContext';
 
+const EditableContext = React.createContext(null);
+const EditableRow = ({ index, ...props }) => {
+    const [form] = Form.useForm();
+    return (
+        <Form form={form} component={false}>
+            <EditableContext.Provider value={form}>
+                <tr {...props} />
+            </EditableContext.Provider>
+        </Form>
+    );
+};
+const EditableCell = ({
+    title,
+    editable,
+    children,
+    dataIndex,
+    record,
+    handleSave,
+    ...restProps
+}) => {
+    const [editing, setEditing] = useState(false);
+    const inputRef = useRef(null);
+    const form = useContext(EditableContext);
+    useEffect(() => {
+        if (editing) {
+            inputRef.current.focus();
+        }
+    }, [editing]);
+    const toggleEdit = () => {
+        setEditing(!editing);
+        form.setFieldsValue({
+            [dataIndex]: record[dataIndex],
+        });
+    };
+    const save = async () => {
+        try {
+            const values = await form.validateFields();
+            toggleEdit();
+            handleSave({
+                ...record,
+                ...values,
+            });
+        } catch (errInfo) {
+            console.log('Save failed:', errInfo);
+        }
+    };
+    let childNode = children;
+    if (editable) {
+        childNode = editing ? (
+            <Form.Item
+                style={{
+                    margin: 0,
+                }}
+                name={dataIndex}
+                rules={[
+                    {
+                        required: true,
+                        message: `${title} is required.`,
+                    },
+                ]}
+            >
+                <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+            </Form.Item>
+        ) : (
+            <div
+                className="editable-cell-value-wrap"
+                style={{
+                    paddingRight: 24,
+                }}
+                onClick={toggleEdit}
+            >
+                {children}
+            </div>
+        );
+    }
+    return <td {...restProps}>{childNode}</td>;
+};
+
 const TablaUsuarios = () => {
     const { authTokens } = useContext(AuthContext);
     const [dataSource, setDataSource] = useState([]); // Inicializa el estado vacío
-
+    const [newUser, setNewUser] = useState(false);
     useEffect(() => {
         // Dentro de un efecto, puedes realizar la llamada a la API de forma asincrónica
         const fetchData = async () => {
@@ -30,10 +108,11 @@ const TablaUsuarios = () => {
             } catch (error) {
                 console.error('Error:', error);
             }
+            setNewUser(false)
         };
 
         fetchData(); // Llama a la función para obtener los datos
-    }, [authTokens.access]);
+    }, [authTokens.access, newUser]);
 
 
     const [count, setCount] = useState(2);
@@ -68,6 +147,7 @@ const TablaUsuarios = () => {
         {
             title: 'Apellido',
             dataIndex: 'apellido',
+            editable: true,
         },
         {
             title: 'Correo',
@@ -75,35 +155,56 @@ const TablaUsuarios = () => {
             width: '30%',
         },
         {
+            title: 'Administrador',
+            dataIndex: 'is_superuser',
+            render: (_, record) =>
+                    <a>{record.is_superuser?"Si":"No"}</a>
+        },
+        {
             title: 'Ultima Sesion',
             dataIndex: 'last_login',
         },
         {
-            title: 'operation',
+            title: 'Operaciones',
             dataIndex: 'operation',
             render: (_, record) =>
                 dataSource.length >= 1 ? (
-                    <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.id)}>
+                    <Popconfirm title="¿Estas seguro que deseas eliminar el usuario?" onConfirm={() => handleDelete(record.id)}>
                         <a>Eliminar</a>
                     </Popconfirm>
                 ) : null,
         },
     ];
-    const handleAdd = (newData) => {
-        setDataSource([...dataSource, newData]);
-        setCount(count + 1);
-    };
-    const handleSave = (row) => {
-        const newData = [...dataSource];
-        const index = newData.findIndex((item) => row.key === item.key);
-        const item = newData[index];
-        newData.splice(index, 1, {
-            ...item,
-            ...row,
-        });
-        setDataSource(newData);
+    const handleSave = async (row) => {
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/proyecto/usuario/${row.id}`, {
+                method: 'PUT', // Utiliza el método PUT para actualizar los datos
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + String(authTokens.access)
+                },
+                body: JSON.stringify({nombre: row.nombre, apellido: row.apellido}), // Envía el objeto actualizado al servidor
+            });
+    
+            if (response.status === 200) {
+                // Actualiza los datos en el estado local
+                const newData = dataSource.map((item) => {
+                    if (item.id === row.id) {
+                        return { ...item, ...row };
+                    }
+                    return item;
+                });
+                setDataSource(newData);
+            } else {
+                console.error('Error:', response.status);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 
+    const components = { body: { row: EditableRow, cell: EditableCell, }, };
     const columns = defaultColumns.map((col) => {
         if (!col.editable) {
             return col;
@@ -114,7 +215,7 @@ const TablaUsuarios = () => {
                 record,
                 editable: col.editable,
                 dataIndex: col.dataIndex,
-                title: col.title,
+                title: col.nombre,
                 handleSave,
             }),
         };
@@ -124,20 +225,36 @@ const TablaUsuarios = () => {
     const showModal = () => {
         setIsModalOpen(true);
     };
-    const handleOk = () => {
-        const newData = {
-            key: count,
-            name: `Edward King ${count}`,
-            age: '32',
-            address: `London, Park Lane no. ${count}`,
-        };
-        handleAdd(newData)
-        setIsModalOpen(false);
+    const [form] = Form.useForm();
+    const handleOk = async (values) => {
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/proyecto/registro`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + String(authTokens.access)
+                },
+                body: JSON.stringify(values)
+            });
+
+            if (response.status === 201) {
+                const user = { ...values, id: count }
+                setNewUser(true)
+                setIsModalOpen(false);
+
+                form.resetFields()
+            } else {
+                console.error('Error:', response.status);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-
 
     return (
         <div>
@@ -150,8 +267,30 @@ const TablaUsuarios = () => {
             >
                 Añadir usuario
             </Button>
-            <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                <Form>
+            <Modal title="Añadir Usuario" open={isModalOpen} onCancel={handleCancel} footer={null}>
+                <Form onFinish={handleOk}>
+                    <Form.Item
+                        name="nombre"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Ingrese su nombres, por favor!',
+                            },
+                        ]}
+                    >
+                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Nombres" />
+                    </Form.Item>
+                    <Form.Item
+                        name="apellido"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Ingrese sus apellidos, por favor!',
+                            },
+                        ]}
+                    >
+                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Apellidos" />
+                    </Form.Item>
                     <Form.Item
                         name="correo"
                         rules={[
@@ -172,12 +311,11 @@ const TablaUsuarios = () => {
                             },
                         ]}
                     >
-                        <Input
-                            prefix={<LockOutlined className="site-form-item-icon" />}
-                            type="password"
-                            placeholder="Contraseña"
-                        />
+                        <Input prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Contraseña" />
                     </Form.Item>
+                    <div>
+                        <Button type="primary" htmlType="submit" block> Enviar </Button>
+                    </div>
                 </Form>
             </Modal>
 
@@ -186,6 +324,7 @@ const TablaUsuarios = () => {
                 bordered
                 dataSource={dataSource}
                 columns={columns}
+                components={components}
             />
         </div>
     );
