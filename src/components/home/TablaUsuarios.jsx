@@ -6,40 +6,58 @@ import AuthContext from '../../context/AuthContext';
 const TablaUsuarios = () => {
     const { authTokens } = useContext(AuthContext);
     const [dataSource, setDataSource] = useState([]); // Inicializa el estado vacío
-  
+
     useEffect(() => {
-      // Dentro de un efecto, puedes realizar la llamada a la API de forma asincrónica
-      const fetchData = async () => {
-        try {
-          const response = await fetch('http://127.0.0.1:8000/proyecto/usuarios', {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + String(authTokens.access)
+        // Dentro de un efecto, puedes realizar la llamada a la API de forma asincrónica
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/proyecto/usuarios', {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + String(authTokens.access)
+                    }
+                });
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    console.log(data)
+                    setDataSource(data.content); // Almacena los datos en el estado
+                } else {
+                    console.error('Error:', response.status);
+                }
+            } catch (error) {
+                console.error('Error:', error);
             }
-          });
-  
-          if (response.status === 200) {
-            const data = await response.json();
-            console.log(data)
-            setDataSource(data.content); // Almacena los datos en el estado
-          } else {
-            console.error('Error:', response.status);
-          }
-        } catch (error) {
-          console.error('Error:', error);
-        }
-      };
-  
-      fetchData(); // Llama a la función para obtener los datos
+        };
+
+        fetchData(); // Llama a la función para obtener los datos
     }, [authTokens.access]);
 
-    
+
     const [count, setCount] = useState(2);
-    const handleDelete = (key) => {
-        const newData = dataSource.filter((item) => item.key !== key);
-        setDataSource(newData);
+    const handleDelete = async (key) => {
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/proyecto/usuario/${key}`, {
+                method: 'DELETE',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + String(authTokens.access)
+                }
+            });
+
+            if (response.status === 200) {
+                const newData = dataSource.filter((item) => item.id !== key);
+                setDataSource(newData);
+            } else {
+                console.error('Error:', response.status);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
     const defaultColumns = [
         {
@@ -65,8 +83,8 @@ const TablaUsuarios = () => {
             dataIndex: 'operation',
             render: (_, record) =>
                 dataSource.length >= 1 ? (
-                    <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.key)}>
-                        <a>Delete</a>
+                    <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.id)}>
+                        <a>Eliminar</a>
                     </Popconfirm>
                 ) : null,
         },
