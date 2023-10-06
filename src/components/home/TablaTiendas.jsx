@@ -79,17 +79,17 @@ const EditableCell = ({
         );
     }
     return <td {...restProps}>{childNode}</td>;
-};
+}; 
 
-const TablaUsuarios = () => {
+const TablaTiendas = () => {
     const { authTokens } = useContext(AuthContext);
     const [dataSource, setDataSource] = useState([]); // Inicializa el estado vacío
-    const [newUser, setNewUser] = useState(false);
+    const [newTienda, setNewTienda] = useState(false);
     useEffect(() => {
         // Dentro de un efecto, puedes realizar la llamada a la API de forma asincrónica
         const fetchData = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:8000/proyecto/usuarios', {
+                const response = await fetch('http://127.0.0.1:8000/proyecto/tiendas', {
                     method: 'GET',
                     headers: {
                         Accept: 'application/json',
@@ -108,18 +108,18 @@ const TablaUsuarios = () => {
             } catch (error) {
                 console.error('Error:', error);
             }
-            setNewUser(false)
+            setNewTienda(false)
         };
 
         fetchData(); // Llama a la función para obtener los datos
-    }, [authTokens.access, newUser]);
+    }, [authTokens.access, newTienda]);
 
 
     const [count, setCount] = useState(2);
     const handleDelete = async (key) => {
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/proyecto/usuario/${key}`, {
+            const response = await fetch(`http://127.0.0.1:8000/proyecto/tienda/${key}`, {
                 method: 'DELETE',
                 headers: {
                     Accept: 'application/json',
@@ -145,31 +145,31 @@ const TablaUsuarios = () => {
             editable: true,
         },
         {
-            title: 'Apellido',
-            dataIndex: 'apellido',
+            title: 'DIRECCION AV/JR',
+            dataIndex: 'direccion',
             editable: true,
         },
         {
-            title: 'Correo',
-            dataIndex: 'correo',
+            title: 'Tipo',
+            dataIndex: 'tipo',
             width: '30%',
         },
         {
-            title: 'Administrador',
-            dataIndex: 'is_superuser',
-            render: (_, record) =>
-                    <a>{record.is_superuser?"Si":"No"}</a>
+            title: 'Fecha creacion',
+            dataIndex: 'fecha_creacion',
+            editable: false,
         },
         {
-            title: 'Ultima Sesion',
-            dataIndex: 'last_login',
+            title: 'Fecha actualizacion',
+            dataIndex: 'fecha_actualizacion',
+            editable: true
         },
         {
             title: 'Operaciones',
             dataIndex: 'operation',
             render: (_, record) =>
                 dataSource.length >= 1 ? (
-                    <Popconfirm title="¿Estas seguro que deseas eliminar el usuario?" onConfirm={() => handleDelete(record.id)}>
+                    <Popconfirm title="¿Estas seguro que deseas eliminar la tienda" onConfirm={() => handleDelete(record.id)}>
                         <a>Eliminar</a>
                     </Popconfirm>
                 ) : null,
@@ -177,14 +177,14 @@ const TablaUsuarios = () => {
     ];
     const handleSave = async (row) => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/proyecto/usuario/${row.id}`, {
+            const response = await fetch(`http://127.0.0.1:8000/proyecto/tienda/${row.id}`, {
                 method: 'PUT', // Utiliza el método PUT para actualizar los datos
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + String(authTokens.access)
                 },
-                body: JSON.stringify({nombre: row.nombre, apellido: row.apellido}), // Envía el objeto actualizado al servidor
+                body: JSON.stringify({nombre: row.nombre , direccion: row.direccion}), // Envía el objeto actualizado al servidor
             });
     
             if (response.status === 200) {
@@ -229,7 +229,7 @@ const TablaUsuarios = () => {
     const handleOk = async (values) => {
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/proyecto/registro`, {
+            const response = await fetch(`http://127.0.0.1:8000/proyecto/tiendas`, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
@@ -241,7 +241,7 @@ const TablaUsuarios = () => {
 
             if (response.status === 201) {
                 const user = { ...values, id: count }
-                setNewUser(true)
+                setNewTienda(true)
                 setIsModalOpen(false);
 
                 form.resetFields()
@@ -252,8 +252,9 @@ const TablaUsuarios = () => {
             console.error('Error:', error);
         }
     };
+     
     const handleCancel = () => {
-        setIsModalOpen(false);
+    setIsModalOpen(false);
     };
 
     return (
@@ -265,53 +266,42 @@ const TablaUsuarios = () => {
                     marginBottom: 16,
                 }}
             >
-                Añadir usuario
+                Añadir Tienda
             </Button>
-            <Modal title="Añadir Usuario" open={isModalOpen} onCancel={handleCancel} footer={null}>
+            <Modal title="Añadir Tienda" open={isModalOpen} onCancel={handleCancel} footer={null}>
                 <Form onFinish={handleOk}>
                     <Form.Item
                         name="nombre"
                         rules={[
                             {
                                 required: true,
-                                message: 'Ingrese su nombres, por favor!',
+                                message: 'Ingrese el nombre de la tienda, por favor!',
                             },
                         ]}
                     >
-                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Nombres" />
+                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Nombre" />
                     </Form.Item>
                     <Form.Item
-                        name="apellido"
+                        name="Tipo"
                         rules={[
                             {
                                 required: true,
-                                message: 'Ingrese sus apellidos, por favor!',
+                                message: 'Ingrese el tipo de tienda, por favor!',
                             },
                         ]}
                     >
-                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Apellidos" />
+                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="BODEGA/MERCADO" />
                     </Form.Item>
                     <Form.Item
-                        name="correo"
+                        name="direccion"
                         rules={[
                             {
                                 required: true,
-                                message: 'Ingrese su correo, por favor!',
+                                message: 'Ingrese la direccion, por favor!',
                             },
                         ]}
                     >
-                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Correo" />
-                    </Form.Item>
-                    <Form.Item
-                        name="password"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Ingrese su contraseña, por favor!',
-                            },
-                        ]}
-                    >
-                        <Input prefix={<LockOutlined className="site-form-item-icon" />} type="password" placeholder="Contraseña" />
+                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Direccion (AV/JR)" />
                     </Form.Item>
                     <div>
                         <Button type="primary" htmlType="submit" block> Enviar </Button>
@@ -330,4 +320,5 @@ const TablaUsuarios = () => {
         </div>
     );
 };
-export default TablaUsuarios;
+export default TablaTiendas;
+

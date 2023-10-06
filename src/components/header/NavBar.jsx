@@ -2,6 +2,8 @@ import React from 'react'
 import { LaptopOutlined, NotificationOutlined, UserOutlined } from '@ant-design/icons';
 import {  Layout, Menu, theme } from 'antd';
 import TablaUsuarios from '../home/TablaUsuarios'
+import TablaTiendas from '../home/TablaTiendas';
+import TablaRelevos from '../home/TablaRelevos';
 const { Content, Footer, Sider } = Layout;
 
 const NavBar = () => {
@@ -17,6 +19,9 @@ const NavBar = () => {
         }}
     >
         <Sider
+         //   theme='dark' 
+         //   breakpoint="lg"
+         //   collapsedWidth="0"
             style={{
                 background: colorBgContainer,
             }}
@@ -51,12 +56,12 @@ const NavBar = () => {
         <Content
             style={{
                 padding: '0 24px',
-                minHeight: 280,
+                /* minHeight: 280, */
             }}
         >
             {/* Sacar tabla a tra vistaaaaaaa */}
-
-           <TablaUsuarios />
+            <TablaTiendas/>
+        { /* <TablaUsuarios /> */ } 
         </Content>
     </Layout>
     )

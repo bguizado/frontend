@@ -18,7 +18,8 @@ const Home = () => {
            <HeaderMain logoutUser={logoutUser} user={user} />
             <Content
                 style={{
-                    padding: '0 50px',
+                    padding: '0 50px', display: 'flex', justifyContent: 'center', alignItems: 'center', 
+                    minHeight: '100vh'
                 }}
             >
                <NavBar/>
