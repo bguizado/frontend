@@ -60,7 +60,7 @@ const NavBar = () => {
             }}
         >
             {/* Sacar tabla a tra vistaaaaaaa */}
-            <TablaTiendas/>
+            <TablaRelevos/>
         { /* <TablaUsuarios /> */ } 
         </Content>
     </Layout>

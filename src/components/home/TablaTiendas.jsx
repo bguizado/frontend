@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Button, Form, Input, Popconfirm, Table, Modal } from 'antd';
+import { Button, Form, Input, Popconfirm, Table, Modal , Select} from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import AuthContext from '../../context/AuthContext';
 
+const { Option } = Select;
 const EditableContext = React.createContext(null);
 const EditableRow = ({ index, ...props }) => {
     const [form] = Form.useForm();
@@ -282,16 +283,20 @@ const TablaTiendas = () => {
                         <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Nombre" />
                     </Form.Item>
                     <Form.Item
-                        name="Tipo"
-                        rules={[
-                            {
-                                required: true,
-                                message: 'Ingrese el tipo de tienda, por favor!',
-                            },
-                        ]}
-                    >
-                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="BODEGA/MERCADO" />
-                    </Form.Item>
+            name="tipo"
+            rules={[
+                {
+                    required: false,
+                    message: 'Seleccione una opción, por favor!',
+                },
+            ]}
+        >
+            <Select placeholder="Seleccione Estado">
+                <Option value="MERCADO">MERCADO</Option>
+                <Option value="BODEGA">BODEGA</Option>
+                
+            </Select>
+        </Form.Item> 
                     <Form.Item
                         name="direccion"
                         rules={[
