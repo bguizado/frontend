@@ -1,8 +1,8 @@
 import AuthContext from '../../context/AuthContext';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Button, Form, Input, Popconfirm, Table, Modal, Select, message } from 'antd'; // Agrega 'Select' y 'Upload' aquí
-import { LockOutlined, UserOutlined, UploadOutlined } from '@ant-design/icons'; // Agrega 'UploadOutlined' aquí
-import { Upload, Icon } from 'antd'
+import { Button, Form, Input, Table, Modal, Select, message } from 'antd'; // Agrega 'Select' y 'Upload' aquí
+import { UploadOutlined } from '@ant-design/icons'; // Agrega 'UploadOutlined' aquí
+import { Upload } from 'antd'
 
 const { Option } = Select;
 

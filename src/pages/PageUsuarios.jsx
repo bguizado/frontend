@@ -16,7 +16,7 @@ const PageUsuarios = () => {
     });
   };
 
-  if (superUser) {
+  if (superUser[0] === true) {
     return (
       <div>
         <Usuarios />

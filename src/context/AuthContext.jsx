@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
 
     let [user, setUser] = useState(() => (localStorage.getItem('authTokens') ? jwtDecode(localStorage.getItem('authTokens')) : null))
     let [authTokens, setAuthTokens] = useState(() => (localStorage.getItem('authTokens') ? JSON.parse(localStorage.getItem('authTokens')) : null))
-    let [superUser, setSuperUser] = useState(false)
+    let [superUser, setSuperUser] = useState(useState(() => (localStorage.getItem('superUser') ? JSON.parse(localStorage.getItem('superUser')) : false)))
 
     const navigate = useNavigate()
 
@@ -30,10 +30,12 @@ export const AuthProvider = ({ children }) => {
 
         if (data) {
             localStorage.setItem('authTokens', JSON.stringify(data));
+          
             setAuthTokens(data)
             let decodeJWT = jwtDecode(data.access)
             setUser(decodeJWT)
             setSuperUser(decodeJWT.is_superuser)
+            localStorage.setItem('superUser', decodeJWT.is_superuser);
 
             // if (decodeJWT.is_superuser === true) {
             //     navigate('/main')
@@ -86,7 +88,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
 
-        const REFRESH_INTERVAL = 1000 * 60 * 1 // 4 minutos
+        const REFRESH_INTERVAL = 1000 * 60 * 1 // 1 minutoS
         let interval = setInterval(() => {
             if (authTokens) {
                 updateToken()

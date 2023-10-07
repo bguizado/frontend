@@ -16,7 +16,7 @@ const PageTiendas = () => {
     });
   };
 
-  if (superUser) {
+  if (superUser[0] === true) {
     return (
       <div>
         <Tiendas />
