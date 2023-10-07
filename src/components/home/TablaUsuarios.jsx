@@ -100,7 +100,6 @@ const TablaUsuarios = () => {
 
                 if (response.status === 200) {
                     const data = await response.json();
-                    console.log(data)
                     setDataSource(data.content); // Almacena los datos en el estado
                 } else {
                     console.error('Error:', response.status);
@@ -256,6 +255,11 @@ const TablaUsuarios = () => {
         setIsModalOpen(false);
     };
 
+    const pagination = {
+        pageSize: 8, // Número de filas por página
+      };
+
+
     return (
         <div>
             <Button
@@ -325,6 +329,7 @@ const TablaUsuarios = () => {
                 dataSource={dataSource}
                 columns={columns}
                 components={components}
+                pagination={pagination} // Configuración de paginación
             />
         </div>
     );

@@ -7,7 +7,6 @@ import { notification } from 'antd';
 
 const PageUsuarios = () => {
   let { superUser } = useContext(AuthContext);
-  console.log(superUser);
 
   const openNotification = () => {
     notification.error({

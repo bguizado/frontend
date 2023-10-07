@@ -27,7 +27,6 @@ export const AuthProvider = ({ children }) => {
 
         let data = await response.json()
 
-        console.log('Valor de authTokens después del inicio de sesión:', data);
 
         if (data) {
             localStorage.setItem('authTokens', JSON.stringify(data));

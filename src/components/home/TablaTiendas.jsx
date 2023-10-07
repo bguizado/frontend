@@ -101,7 +101,6 @@ const TablaTiendas = () => {
 
                 if (response.status === 200) {
                     const data = await response.json();
-                    console.log(data)
                     setDataSource(data.content); // Almacena los datos en el estado
                 } else {
                     console.error('Error:', response.status);
@@ -256,6 +255,11 @@ const TablaTiendas = () => {
         setIsModalOpen(false);
     };
 
+    const pagination = {
+        pageSize: 8, // Número de filas por página
+      };
+
+
     return (
         <div>
             <Button
@@ -270,7 +274,7 @@ const TablaTiendas = () => {
             <Modal title="Añadir Tienda" open={isModalOpen} onCancel={handleCancel} footer={null}>
                 <Form onFinish={handleOk}>
                     <Form.Item
-                        name="Razón social"
+                        name="nombre"
                         rules={[
                             {
                                 required: true,
@@ -319,6 +323,7 @@ const TablaTiendas = () => {
                 columns={columns}
                 components={components}
                 scroll={{ x: 'max-content' }}
+                pagination={pagination} // Configuración de paginación
             />
         </div>
     );

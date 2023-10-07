@@ -1,7 +1,8 @@
 import AuthContext from '../../context/AuthContext';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Button, Form, Input, Popconfirm, Table, Modal, Select, Upload } from 'antd'; // Agrega 'Select' y 'Upload' aquí
+import { Button, Form, Input, Popconfirm, Table, Modal, Select, message } from 'antd'; // Agrega 'Select' y 'Upload' aquí
 import { LockOutlined, UserOutlined, UploadOutlined } from '@ant-design/icons'; // Agrega 'UploadOutlined' aquí
+import { Upload, Icon } from 'antd'
 
 const { Option } = Select;
 
@@ -43,7 +44,7 @@ const EditableCell = ({
         try {
             const values = await form.validateFields();
             toggleEdit();
-        
+
         } catch (errInfo) {
             console.log('Save failed:', errInfo);
         }
@@ -84,6 +85,7 @@ const TablaRelevos = () => {
     const { authTokens } = useContext(AuthContext);
     const [dataSource, setDataSource] = useState([]); // Inicializa el estado vacío
     const [newRelevo, setNewRelevo] = useState(false);
+
     useEffect(() => {
         // Dentro de un efecto, puedes realizar la llamada a la API de forma asincrónica
         const fetchData = async () => {
@@ -99,7 +101,6 @@ const TablaRelevos = () => {
 
                 if (response.status === 200) {
                     const data = await response.json();
-                    console.log(data)
                     setDataSource(data.content); // Almacena los datos en el estado
                 } else {
                     console.error('Error:', response.status);
@@ -115,7 +116,7 @@ const TablaRelevos = () => {
 
 
     const [count, setCount] = useState(2);
-    
+
     const defaultColumns = [
         {
             title: 'Implementado',
@@ -161,7 +162,7 @@ const TablaRelevos = () => {
                 editable: col.editable,
                 dataIndex: col.dataIndex,
                 title: col.nombre,
-              
+
             }),
         };
     });
@@ -170,27 +171,54 @@ const TablaRelevos = () => {
     const showModal = () => {
         setIsModalOpen(true);
     };
+
+
+    const [imagenFile, setImagenfile] = useState('')
+
+    const props = {
+        name: 'file',
+        action: 'https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188',
+        headers: {
+            authorization: 'authorization-text',
+        },
+        onChange(info) {
+            if (info.file.status === 'done') {
+                message.success(`${info.file.name} file uploaded successfully`);
+                setImagenfile(info.file.originFileObj)
+
+            } else if (info.file.status === 'error') {
+                message.error(`${info.file.name} file upload failed.`);
+            }
+        },
+    };
+
+
+
     const [form] = Form.useForm();
-    const [tienda, setTiendas] = useState([]); // Define tienda como un estado
 
     const handleOk = async (values) => {
+
+        let formData = new FormData();
+        formData.append("imagen", imagenFile)
+        formData.append("implementado", values.implementado)
+        formData.append('estado', values.estado)
+        formData.append('tienda', values.tienda)
+
+
         try {
             const response = await fetch(`http://127.0.0.1:8000/proyecto/relevo`, {
                 method: 'POST',
                 headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + String(authTokens.access)
                 },
-                body: JSON.stringify(values)
+                body: formData
             });
-            
-    
+
             if (response.status === 201) {
                 const relevo = { ...values, id: count }
                 setNewRelevo(true)
                 setIsModalOpen(false);
-    
+
                 form.resetFields()
             } else {
                 console.error('Error:', response.status);
@@ -202,41 +230,12 @@ const TablaRelevos = () => {
     const handleCancel = () => {
         setIsModalOpen(false);
     };
-    const obtenerTiendas = async () => {
-        try {
-            const tiendasResponse = await fetch('http://127.0.0.1:8000/proyecto/tiendas', {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + String(authTokens.access)
-                },
-            });
-    
-            if (tiendasResponse.ok) {
-                const tiendasData = await tiendasResponse.json();
-                const tiendasArray = Object.values(tiendasData);
-                setTiendas(tiendasArray);
-            } else {
-                console.error('Error al obtener datos de la API');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-    
-    useEffect(() => {
-        if (isModalOpen) {
-            obtenerTiendas();
-        }
-    }, [isModalOpen]);
 
-    const normFile = (e) => {
-        if (Array.isArray(e)) {
-            return e;
-        }
-        return e && e.fileList;
-    }; 
+    const pagination = {
+        pageSize: 8, // Número de filas por página
+      };
+
+
 
     return (
         <div>
@@ -250,57 +249,53 @@ const TablaRelevos = () => {
                 Crear Relevo
             </Button>
             <Modal title="Crear Relevo" open={isModalOpen} onCancel={handleCancel} footer={null}>
-            <Form onFinish={handleOk}>
-                            <Form.Item
-                name="implementado"
-                rules={[
-                    {
-                        required: false,
-                        message: 'Seleccione una opción, por favor!',
-                    },
-                ]}
-            >
-                <Select placeholder="Seleccione Implementado">
-                    <Option value="MERCADERISMO">Mercaderismo</Option>
-                    <Option value="SIN MERCADERISMO">Sin Mercaderismo</Option>
-                </Select>
-            </Form.Item>
+                <Form onFinish={handleOk}>
                     <Form.Item
-            name="estado"
-            rules={[
-                {
-                    required: false,
-                    message: 'Seleccione una opción, por favor!',
-                },
-            ]}
-        >
-            <Select placeholder="Seleccione Estado">
-                <Option value="EFECTIVO">Efectivo</Option>
-                <Option value="NO DESEA">No Desea</Option>
-                <Option value="CERRADO">Cerrado</Option>
-            </Select>
-        </Form.Item> 
+                        name="implementado"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Seleccione una opción, por favor!',
+                            },
+                        ]}
+                    >
+                        <Select placeholder="Seleccion si implemento o no, la tienda">
+                            <Option value="MERCADERISMO">MERCADERISMO</Option>
+                            <Option value="SIN MERCADERISMO">SIN MERCADERISMO</Option>
+                        </Select>
+                    </Form.Item>
                     <Form.Item
-                name="imagen"
-                valuePropName="fileList"
-                getValueFromEvent={normFile}
-                rules={[
-                    {
-                        required: false,
-                        message: 'Suba una imagen, por favor!',
-                    },
-                ]}
-            >
-                <Upload
-                    name="logo"
-                    action="/upload.do"
-                    listType="picture"
-                >
-                    <Button icon={<UploadOutlined />}>Subir Imagen</Button>
-                </Upload>
-            </Form.Item> 
-                <Form.Item
-                        name="tienda_id"
+                        name="estado"
+                        rules={[
+                            {
+                                required: true,
+                                message: 'Seleccione una opción, por favor!',
+                            },
+                        ]}
+                    >
+                        <Select placeholder="Seleccione Estado">
+                            <Option value="EFECTIVO">EFECTIVO</Option>
+                            <Option value="NO DESEA">NO DESEA</Option>
+                            <Option value="CERRADO">CERRADO</Option>
+                        </Select>
+                    </Form.Item>
+                    {/* <Form.Item
+                        name="imagen"
+                        rules={[
+                            {
+                                required: false,
+                                message: 'Suba una imagen, por favor!',
+                            },
+                        ]}
+                    >
+                        <Input type="file" name="" id="" />
+                    </Form.Item> */}
+                    <Upload {...props}>
+                        <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                    </Upload>
+
+                    <Form.Item
+                        name="tienda"
                         rules={[
                             {
                                 required: true,
@@ -308,14 +303,8 @@ const TablaRelevos = () => {
                             },
                         ]}
                     >
-                        <Select placeholder="Seleccione tienda">
-                            {tienda.map((tienda) => (
-                                <Option key={tienda.id} value={tienda.id}>
-                                    {tienda.nombre}
-                                </Option>
-                            ))}
-                        </Select>
-                </Form.Item>
+                        <Input placeholder="tienda" />
+                    </Form.Item>
                     <div>
                         <Button type="primary" htmlType="submit" block> Enviar </Button>
                     </div>
@@ -329,6 +318,7 @@ const TablaRelevos = () => {
                 columns={columns}
                 components={components}
                 scroll={{ x: 'max-content' }}
+                pagination={pagination} // Configuración de paginación
             />
         </div>
     );
