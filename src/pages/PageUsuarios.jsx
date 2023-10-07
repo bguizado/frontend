@@ -15,8 +15,8 @@ const PageUsuarios = () => {
       duration: 3, // Duración en segundos que deseas que se muestre la notificación
     });
   };
-
-  if (superUser[0] === true) {
+  console.log(superUser)
+  if (superUser === true) {
     return (
       <div>
         <Usuarios />
