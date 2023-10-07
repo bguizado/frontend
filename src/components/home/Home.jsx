@@ -15,8 +15,15 @@ const Home = () => {
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+
+    const containerStyle = {
+        minHeight: '100vh', // Establece la altura mínima para ocupar toda la pantalla verticalmente
+        display: 'flex',
+        flexDirection: 'column',
+    };
+
     return (
-        <Layout>
+        <Layout style={containerStyle}>
             <HeaderMain logoutUser={logoutUser} user={user} />
             <Content
                 style={{
@@ -34,12 +41,24 @@ const Home = () => {
                         style={{
                             padding: '0 24px',
                             minHeight: 280,
-                        }}
-                    >   
-                        <h1>BIENVENIDO AL PANEL ADMINISTRATIVO DE POINTDATA</h1>
+                            display: 'flex', alignContent: 'center',
+                            flexDirection: 'column',
+                            textAlign: 'center',
+                            marginTop: '40px',
+                            gap: '20px'
+                            
+                        }}>                      
+                            <h1 style={{
+                                fontFamily: 'Trebuchet MS',                                
+                            }} >BIENVENIDO AL PANEL ADMINISTRATIVO DE POINTDATA </h1>
+                          
+                            <p style={{
+                                fontFamily: 'Trebuchet MS',                               
+                            }}> Pointdata es un ERP de mercaderismo, creado por Codigo Corp, empresa dedica a la soluciones tecnologícas </p>
+                        
                     </Content>
                 </Layout>
-            </Content>
+            </Content >
             <Footer
                 style={{
                     textAlign: 'center',
@@ -47,7 +66,7 @@ const Home = () => {
             >
                 Pointdata ©2023
             </Footer>
-        </Layout>
+        </Layout >
     );
 };
 export default Home;

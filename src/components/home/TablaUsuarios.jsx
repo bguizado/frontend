@@ -330,6 +330,7 @@ const TablaUsuarios = () => {
                 columns={columns}
                 components={components}
                 pagination={pagination} // Configuración de paginación
+                scroll={{ x: 'max-content' }}
             />
         </div>
     );

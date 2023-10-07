@@ -233,7 +233,43 @@ const TablaRelevos = () => {
 
     const pagination = {
         pageSize: 8, // Número de filas por página
-      };
+    };
+
+
+
+
+    const [selectTienda, setSelectTienda] = useState([]);
+
+    // Dentro de un efecto, puedes realizar la llamada a la API de forma asincrónica
+    const fetchData = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/proyecto/tiendas', {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + String(authTokens.access)
+                }
+            });
+
+            if (response.status === 200) {
+                const data = await response.json();
+                setSelectTienda(data.content); // Almacena los datos en el estado
+            } else {
+                console.error('Error:', response.status);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    if (selectTienda.length < 1) {
+        fetchData(); // Llama a la función para obtener los datos
+    }
+
+
+
+
 
 
 
@@ -303,7 +339,13 @@ const TablaRelevos = () => {
                             },
                         ]}
                     >
-                        <Input placeholder="tienda" />
+                        <Select placeholder="Seleccione Tienda">
+                            {selectTienda?.map((ele) => {
+                                return <Option value={ele.id}>{ele.nombre}</Option>
+                            })
+                            }
+
+                        </Select>
                     </Form.Item>
                     <div>
                         <Button type="primary" htmlType="submit" block> Enviar </Button>
