@@ -318,14 +318,16 @@ const TablaUsuarios = () => {
                     </div>
                 </Form>
             </Modal>
-
+            <div style={{overflowY: 'auto' , maxHeight: 'calc(100vh - 200px)'}} >
             <Table
                 rowClassName={() => 'editable-row'}
                 bordered
                 dataSource={dataSource}
                 columns={columns}
                 components={components}
+                scroll={{ x: 'max-content' }}
             />
+            </div>
         </div>
     );
 };

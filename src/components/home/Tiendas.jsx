@@ -16,18 +16,24 @@ const Tiendas = () => {
     const {
         token: { colorBgContainer },
     } = theme.useToken();
+
+    const containerStyle = {
+        minHeight: '100vh', // Establece la altura mínima para ocupar toda la pantalla verticalmente
+        display: 'flex',
+        flexDirection: 'column',};
     return (
-        <Layout>
+        <Layout style={containerStyle}>
             <HeaderMain logoutUser={logoutUser} user={user} />
             <Content
                 style={{
                     padding: '0 50px',
+                    flexGrow: 1
                 }}
             >
                 <Layout
                     style={{
                         padding: '24px 0',
-                        background: colorBgContainer,
+                    
                     }}
                 >
                     <NavBar />

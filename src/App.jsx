@@ -19,7 +19,7 @@ function App() {
           <Route path="/login" element={<PageLogin/>}/>
           <Route path="/usuarios" element={<PageUsuarios/>}/>
           <Route path="/tiendas" element={<PageTiendas/>}/>
-          <Route path="/relevos" element={<PageRelevos/>}/>
+          <Route path="/relevos" element={<PrivateRoute><PageRelevos/> </PrivateRoute>}/>
         </Routes>
       </AuthProvider>
     </Router>

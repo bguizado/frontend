@@ -153,7 +153,7 @@ const TablaTiendas = () => {
         {
             title: 'Tipo',
             dataIndex: 'tipo',
-            width: '30%',
+            width: '20%',
         },
         {
             title: 'Fecha creacion',
@@ -270,7 +270,7 @@ const TablaTiendas = () => {
             <Modal title="Añadir Tienda" open={isModalOpen} onCancel={handleCancel} footer={null}>
                 <Form onFinish={handleOk}>
                     <Form.Item
-                        name="Razón social"
+                        name="nombre"
                         rules={[
                             {
                                 required: true,
@@ -311,7 +311,7 @@ const TablaTiendas = () => {
                     </div>
                 </Form>
             </Modal>
-
+            <div style={{overflowY: 'auto' , maxHeight: 'calc(100vh - 200px)'}}>
             <Table
                 rowClassName={() => 'editable-row'}
                 bordered
@@ -320,6 +320,8 @@ const TablaTiendas = () => {
                 components={components}
                 scroll={{ x: 'max-content' }}
             />
+            </div>
+
         </div>
     );
 };
