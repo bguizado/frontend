@@ -6,8 +6,6 @@ import { Link } from 'react-router-dom';
 
 const { Sider } = Layout;
 
-
-
 const NavBar = () => {
     const [current, setCurrent] = useState();
 
@@ -51,7 +49,7 @@ const NavBar = () => {
                     {
                         key: '3',
                         icon: <FormOutlined />,
-                        label: 'Registros',
+                        label: <Link to={"/relevos"}>Relevos</Link>
                     },
                 ]}
             />
