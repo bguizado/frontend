@@ -302,7 +302,7 @@ const TablaRelevos = () => {
                     <Button icon={<UploadOutlined />}>Subir Imagen</Button>
                 </Upload>
             </Form.Item> 
-                <Form.Item
+           { /* <Form.Item
                         name="tienda_id"
                         rules={[
                             {
@@ -318,6 +318,17 @@ const TablaRelevos = () => {
                                 </Option>
                             ))}
                         </Select>
+                            </Form.Item> */}
+                                            <Form.Item
+                    name="tienda_id"
+                    rules={[
+                        {
+                            required: false,
+                            message: 'Ingrese el ID de la tienda, por favor!',
+                        },
+                    ]}
+                >
+                    <Input placeholder="Ingrese el ID de la tienda" />
                 </Form.Item>
                     <div>
                         <Button type="primary" htmlType="submit" block> Enviar </Button>
