@@ -3,12 +3,13 @@ import { Layout, theme } from 'antd';
 import AuthContext from '../../context/AuthContext';
 import HeaderMain from '../header/HeaderMain'
 import NavBar from '../header/NavBar'
+import TablaTiendas from './TablaTiendas';
 
 
 const { Content, Footer, Sider } = Layout;
 
 
-const Home = () => {
+const Tiendas = () => {
 
     let { user, logoutUser } = useContext(AuthContext)
 
@@ -35,8 +36,8 @@ const Home = () => {
                             padding: '0 24px',
                             minHeight: 280,
                         }}
-                    >   
-                        <h1>BIENVENIDO AL PANEL ADMINISTRATIVO DE POINTDATA</h1>
+                    >
+                        <TablaTiendas />
                     </Content>
                 </Layout>
             </Content>
@@ -50,4 +51,4 @@ const Home = () => {
         </Layout>
     );
 };
-export default Home;
+export default Tiendas;

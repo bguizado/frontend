@@ -1,21 +1,27 @@
-import React from 'react'
-import { LaptopOutlined, NotificationOutlined, UserOutlined } from '@ant-design/icons';
-import {  Layout, Menu, theme } from 'antd';
-import TablaUsuarios from '../home/TablaUsuarios'
-const { Content, Footer, Sider } = Layout;
+import React, { useState } from 'react';
+import { HomeOutlined, FormOutlined, UserOutlined } from '@ant-design/icons';
+import { Layout, Menu, theme } from 'antd';
+import { Link } from 'react-router-dom';
+
+
+const { Sider } = Layout;
+
+
 
 const NavBar = () => {
+    const [current, setCurrent] = useState();
+
+    const onClick = (e) => {
+        console.log('click ', e);
+        setCurrent(e.key);
+    };
+
     const {
         token: { colorBgContainer },
     } = theme.useToken();
 
-    return(
-        <Layout
-        style={{
-            padding: '24px 0',
-            background: colorBgContainer,
-        }}
-    >
+    return (
+
         <Sider
             style={{
                 background: colorBgContainer,
@@ -24,41 +30,33 @@ const NavBar = () => {
         >
             <Menu
                 mode="inline"
-                defaultSelectedKeys={['1']}
-                defaultOpenKeys={['sub1']}
+                onClick={onClick}
+                selectedKeys={[current]}
+                // defaultSelectedKeys={[current]}
+                // defaultOpenKeys={[]}
                 style={{
                     height: '100%',
                 }}
                 items={[
                     {
-                      key: '1',
-                      icon: <UserOutlined />,
-                      label: 'Usuarios',                                
+                        key: '1',
+                        icon: <UserOutlined />,
+                        label: <Link to={"/usuarios"}>Usuarios</Link>
                     },
                     {
                         key: '2',
-                        icon: <LaptopOutlined />,
-                        label: 'Tiendas',
-                      },
-                      {
+                        icon: <HomeOutlined />,
+                        label: <Link to={"/tiendas"}>Tiendas</Link>
+                    },
+                    {
                         key: '3',
-                        icon: <NotificationOutlined />,
+                        icon: <FormOutlined />,
                         label: 'Registros',
-                      },
+                    },
                 ]}
             />
         </Sider>
-        <Content
-            style={{
-                padding: '0 24px',
-                minHeight: 280,
-            }}
-        >
-            {/* Sacar tabla a tra vistaaaaaaa */}
 
-           <TablaUsuarios />
-        </Content>
-    </Layout>
     )
 }
 export default NavBar
